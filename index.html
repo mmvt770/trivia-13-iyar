@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <link rel="icon" type="image/png" href="favicon.png?v=1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>טריוויה י"א ניסן - יום הולדת הרבי</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Assistant', sans-serif;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            min-height: 100vh;
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .option-btn {
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+        }
+        .option-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.15);
+            border-color: #ca8a04;
+            background: white;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-question {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+        .input-field {
+            background: white !important;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+            color: #1e293b;
+        }
+        .input-field:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            outline: none;
+        }
+        #admin-modal-overlay {
+            background: rgba(0, 0, 0, 0.85);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 9999;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
+        }
+        .modal-content {
+            pointer-events: auto;
+            position: relative;
+            z-index: 10000;
+        }
+        .status-pulse {
+            animation: status-pulse 0.5s ease-in-out infinite alternate;
+        }
+        @keyframes status-pulse {
+            from { transform: scale(1); }
+            to { transform: scale(1.05); }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center p-4">
+
+    <!-- ADMIN MODAL -->
+    <div id="admin-modal-overlay" onclick="closeAdminModalOutside(event)">
+        <div class="modal-content bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl text-center" onclick="event.stopPropagation()">
+            <h3 class="text-2xl font-bold text-blue-900 mb-4">כניסת מנהל</h3>
+            <p class="text-gray-600 mb-6">הזן קוד גישה:</p>
+            <input type="tel" id="admin-pass-input" 
+                   class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 mb-6 text-center text-3xl font-bold tracking-widest focus:border-blue-500 outline-none text-blue-900" 
+                   placeholder="----"
+                   autocomplete="off">
+            <div class="flex gap-3">
+                <button onclick="checkAdminPassword()" class="flex-1 bg-blue-900 text-white font-bold py-4 rounded-xl hover:bg-blue-800 transition-colors">אישור</button>
+                <button onclick="closeAdminModal()" class="flex-1 bg-gray-100 text-gray-600 font-bold py-4 rounded-xl hover:bg-gray-200 transition-colors">ביטול</button>
+            </div>
+            <p id="admin-error" class="text-red-500 font-bold mt-4 hidden">קוד שגוי.</p>
+        </div>
+    </div>
+
+    <div id="game-container" class="max-w-4xl w-full glass-card p-6 md:p-12 text-center text-gray-800 relative shadow-2xl">
+        
+        <!-- START SCREEN -->
+        <div id="start-screen" class="relative z-10">
+            <h1 class="text-5xl md:text-7xl font-extrabold text-blue-900 mb-6 tracking-tight text-center">חידון י"א ניסן</h1>
+            <h2 class="text-xl md:text-3xl font-semibold text-yellow-600 mb-8 text-center leading-relaxed">
+                כמה אתה יודע על הרבי מליובאוויטש?
+            </h2>
+            
+            <div class="flex justify-center mb-8">
+                <div class="p-6 bg-yellow-50 rounded-full shadow-inner border border-yellow-200">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ca8a04" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 15l-2-7 5 3 4-8 4 8 5-3-2 7h-14z"></path>
+                        <path d="M22 17v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="max-w-md mx-auto mb-8 bg-gray-50 p-6 rounded-2xl shadow-inner border border-gray-200 text-right">
+                <p class="text-gray-600 font-bold mb-4 text-lg">אנא מלא את פרטיך כדי להתחיל:</p>
+                <div class="mb-4">
+                    <label class="block text-blue-900 font-bold mb-2">שם מלא:</label>
+                    <input type="text" id="user-name" placeholder="ישראל ישראלי" class="w-full px-4 py-3 rounded-xl input-field text-right">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-blue-900 font-bold mb-2">כתובת אימייל:</label>
+                    <input type="email" id="user-email" placeholder="email@example.com" dir="ltr" class="w-full px-4 py-3 rounded-xl input-field text-left">
+                </div>
+                <div class="flex items-start gap-3 bg-blue-50 p-3 rounded-lg border border-blue-100 mb-2">
+                    <input type="checkbox" id="email-consent" class="mt-1 w-5 h-5 cursor-pointer">
+                    <label for="email-consent" class="text-sm text-blue-900 font-semibold cursor-pointer select-none">אני מאשר קבלת אימייל עם תוצאות החידון.</label>
+                </div>
+                <p id="form-error" class="text-red-500 font-bold hidden mb-2 text-center">מלא את כל הפרטים ואשר קבלת אימייל.</p>
+            </div>
+            
+            <button onclick="validateAndStart()" class="bg-blue-900 hover:bg-blue-800 text-white font-bold py-5 px-10 md:px-16 rounded-2xl text-xl md:text-2xl shadow-lg transition-all transform hover:scale-105">התחל את החידון</button>
+            
+            <!-- ADMIN INTERFACE -->
+            <div id="admin-controls" class="hidden flex flex-col items-center gap-4 mt-6 p-8 border-4 border-dashed border-red-200 rounded-3xl bg-red-50">
+                <div class="mb-6 flex flex-col items-center w-full">
+                    <label class="block text-red-800 font-extrabold mb-3 text-xl">כמות שאלות נכונות (0-30):</label>
+                    <input type="number" id="admin-score-input" min="0" max="30" value="30" class="w-32 px-4 py-3 rounded-2xl border-4 border-red-300 text-center text-3xl font-black text-red-900 focus:outline-none focus:border-red-500 shadow-inner">
+                </div>
+                
+                <div class="flex flex-col md:flex-row gap-6 w-full justify-center">
+                    <button onclick="previewEndScreen()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-black py-4 px-8 rounded-2xl text-xl transition-all shadow-md">👁️ תצוגה מקדימה</button>
+                    
+                    <div id="test-btn-container" class="relative">
+                        <button id="main-test-btn" onclick="confirmTestSend()" class="bg-red-600 hover:bg-red-700 text-white font-black py-4 px-8 rounded-2xl text-xl transition-all shadow-lg">🧪 שלח טסט לוובהוק</button>
+                        <div id="confirm-test-area" class="hidden flex gap-4">
+                            <button onclick="sendTestWebhook()" class="bg-red-700 text-white px-8 py-4 rounded-2xl text-2xl font-black shadow-2xl border-4 border-white animate-pulse">שלח עכשיו!</button>
+                            <button onclick="cancelTestSend()" class="bg-gray-500 text-white px-8 py-4 rounded-2xl text-2xl font-black shadow-md">ביטול</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="admin-status-msg" class="hidden mt-6 p-6 bg-red-600 text-white rounded-2xl border-8 border-red-900 shadow-2xl status-pulse">
+                    <p class="text-3xl font-black">הטסט נשלח בהצלחה! 🚀</p>
+                </div>
+            </div>
+
+            <div class="mt-12 flex justify-center">
+                <button onclick="openAdminModal()" class="opacity-40 hover:opacity-100 text-gray-400 text-sm transition-all border border-gray-200 hover:bg-gray-100 px-4 py-2 rounded-lg cursor-pointer">🔐 כניסת מנהל</button>
+            </div>
+        </div>
+
+        <!-- QUIZ SCREEN -->
+        <div id="quiz-screen" class="hidden animate-question">
+            <div class="w-full bg-gray-100 rounded-full h-3 mb-8 overflow-hidden shadow-inner">
+                <div id="progress-bar" class="bg-gradient-to-r from-yellow-400 to-yellow-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between items-center mb-8 border-b pb-4">
+                <span id="question-counter" class="text-blue-900 font-extrabold text-lg md:text-2xl">שאלה 1 / 30</span>
+                <span id="score-display" class="bg-blue-900 text-white px-4 md:px-6 py-2 rounded-xl font-bold text-lg">ניקוד: 0</span>
+            </div>
+            <div class="mb-10 text-center">
+                <h2 id="question-text" class="text-2xl md:text-4xl font-bold text-gray-800 mb-10 leading-snug"></h2>
+                <div id="options-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5"></div>
+            </div>
+            <div id="feedback" class="hidden mt-8 p-5 rounded-2xl font-bold text-xl md:text-2xl border-2 text-center"></div>
+        </div>
+
+        <!-- END SCREEN -->
+        <div id="end-screen" class="hidden relative z-10 text-center">
+            <h2 class="text-4xl md:text-5xl font-black text-blue-900 mb-6" id="end-greeting">החידון הושלם!</h2>
+            <div class="text-7xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-700 mb-4" id="final-score">0/30</div>
+            <p id="score-message" class="text-xl md:text-2xl mb-6 font-bold text-blue-900"></p>
+            <div class="bg-blue-50 p-4 rounded-xl border border-blue-200 mb-8 max-w-sm mx-auto">
+                <p class="text-blue-900 font-bold text-lg text-center">📩 אימייל עם תוצאות החידון נשלח אליך ברגע זה!</p>
+            </div>
+            <p id="webhook-status" class="text-lg font-bold text-gray-600 mb-6 hidden text-center">שומר תוצאה במערכת...</p>
+            <button onclick="restartGame()" class="bg-gray-800 hover:bg-black text-white font-bold py-3 px-10 rounded-full text-xl transition-all shadow-xl">נסה שוב</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: `באיזו שנה נולד הרבי?`, options: [`תרס"א (1901)`, `תרס"ב (1902)`, `תרס"ג (1903)`, `תרס"ד (1904)`], correct: 1 },
+            { q: `מי היה הסנדק בברית המילה של הרבי?`, options: [`אביו, רבי לוי יצחק`, `סבו, רבי ברוך שניאור`, `לא ידוע`, `הרבי הריי"צ`], correct: 2 },
+            { q: `באיזה תאריך נערכה חתונת הרבי והרבנית חיה מושקא בוורשה?`, options: [`י"א ניסן תרפ"ט`, `י"ד כסלו תרפ"ט`, `י' שבט תרפ"ח`, `כ"ח סיון תש"א`], correct: 1 },
+            { q: `כיצד נקראה האוניה בה הגיעו הרבי והרבנית לארצות הברית?`, options: [`קווין מרי`, `סרפה פינטו`, `מוריטניה`, `סטורדייל`], correct: 1 },
+            { q: `מהו הספר הראשון שהרבי ליקט, ערך והוציא לאור בארה"ב?`, options: [`היום יום`, `לקוטי שיחות`, `אגרות קודש`, `ספר המאמרים`], correct: 0 },
+            { q: `באיזה מוסד בפריז הוענק לרבי התואר "מהנדס חשמל"?`, options: [`אוניברסיטת ברלין`, `אוניברסיטת הסורבון`, `ESTP בפריז`, `המכון הטכנולוגי`], correct: 2 },
+            { q: `באיזו שנה הכריז הרבי על "מבצע תפילין"?`, options: [`תשכ"ז (1967)`, `תשל"ד (1973)`, `תש"מ (1980)`, `תשמ"ב (1982)`], correct: 0 },
+            { q: `מי נחשב לשליח הראשון שהרבי שלח למרוקו בשנת תש"י?`, options: [`הרב ניסן פינסון`, `הרב שלמה מטוסוב`, `הרב לייבל רסקין`, `הרב אברהם שם טוב`], correct: 1 },
+            { q: `באיזה תאריך חל היארצייט של אביו של הרבי, רבי לוי יצחק?`, options: [`כ' מנחם אב`, `ח"י אלול`, `ה' טבת`, `ו' תשרי`], correct: 0 },
+            { q: `כמה כרכים מונה סדרת "לקוטי שיחות" (המהדורה הרשמית)?`, options: [`35`, `40`, `41`, `45`], correct: 2 },
+            { q: `באיזו שנה יסד הרבי את הארגון לילדים "צבאות השם"?`, options: [`תשל"א`, `תשל"ו`, `תשמ"א`, `תשמ"ז`], correct: 2 },
+            { q: `עם איזה מאמר קיבל הרבי עליו את הנשיאות בי' שבט תשי"א?`, options: [`ציון במשפט תפדה`, `ואתה תצווה`, `אנא נסיב מלכא`, `באתי לגני`], correct: 3 },
+            { q: `באיזה תאריך חוגגים החסידים את "דידן נצח" (סיום משפט הספרים)?`, options: [`ה' טבת`, `י"ט כסלו`, `י"ב תמוז`, `י"ג תשרי`], correct: 0 },
+            { q: `מי מונה ליו"ר המוסד "מחנה ישראל" עם הקמתו על ידי הרבי הריי"צ?`, options: [`הרבי`, `הרב חודקוב`, `הרב מנטליק`, `הרב גוראריה`], correct: 0 },
+            { q: `בעקבות איזה אירוע כואב בשנת תשל"ד הכריז הרבי על "מבצע מזוזה"?`, options: [`מלחמת יום כיפור`, `הפיגוע במעלות (אסון מעלות)`, `חטיפת מטוס באנטבה`, `מלחמת ששת הימים`], correct: 1 },
+            { q: `באיזו שנה החלה חלוקת "דולרים לצדקה" באופן קבוע בימי ראשון?`, options: [`תשל"ח`, `תשמ"ו`, `תש"נ`, `תשמ"ט`], correct: 1 },
+            { q: `מה היה שמו של אחיו הצעיר של הרבי (אשר נטמן בצפת)?`, options: [`דובער`, `ברוך שניאור`, `ישראל אריה לייב`, `לוי יצחק`], correct: 2 },
+            { q: `איזו תקנה תורנית תיקן הרבי במטרה לאחד את כל עם ישראל סביב לימוד כל התורה כולה?`, options: [`לימוד חת"ת`, `תקנת הרמב"ם היומי`, `מבצע אות בספר תורה`, `שנת הקהל`], correct: 1 },
+            { q: `מהי עיר הולדתו של הרבי?`, options: [`ליובאוויטש`, `רוסטוב`, `יקטרינוסלב`, `ניקולייב`], correct: 3 },
+            { q: `מי הייתה אמו של הרבי?`, options: [`הרבנית שטערנא שרה`, `הרבנית חנה`, `הרבנית רבקה`, `הרבנית חיה מושקא`], correct: 1 },
+            { q: `מה חילק הרבי באופן מסורתי בערב יום כיפור?`, options: [`דולרים כפולים`, `כוס של ברכה`, `לעקאח (עוגת דבש)`, `מטבעות לצדקה`], correct: 2 },
+            { q: `איזה חיבור יסודי כתב הרבי בצרפת בטרם נמלט לארה"ב?`, options: [`מראה מקומות לתניא`, `הגדה של פסח עם לקוטי מנהגים`, `רשימות על התניא`, `לקוטי תורה צמח צדק`], correct: 2 },
+            { q: `לאיזו רשת מוסדות חינוך קרא הרבי בחיבה "הבובה שלי"?`, options: [`רשת אהלי יוסף יצחק באה"ק`, `תומכי תמימים`, `בית חב"ד`, `מכון חנה`], correct: 0 },
+            { q: `מהו הקונטרס האחרון שחילק הרבי בידו הקדושה לפני כ"ז אדר א' תשנ"ב?`, options: [`קונטרס ענינה של תורת החסידות`, `קונטרס בית רבינו שבבבל`, `קונטרס ואתה תצוה`, `קונטרס פורים קטן`], correct: 2 },
+            { q: `כמה מבצעים כלולים ברשימה המקורית של "מבצעי הרבי"?`, options: [`7`, `10`, `12`, `15`], correct: 1 },
+            { q: `באיזה תאריך חל יום ההסתלקות של הרבנית חיה מושקא ע"ה (בשנת תשמ"ח)?`, options: [`כ"ב שבט`, `ו' תשרי`, `י"ג אדר`, `י' שבט`], correct: 0 },
+            { q: `באיזו עיר שימש רבי לוי יצחק, אביו של הרבי, כרב הראשי?`, options: [`פטרבורג`, `מוסקבה`, `יקטרינוסלב (דניפרו)`, `ניקולייב`], correct: 2 },
+            { q: `איזה ניגון שלימד הרבי הפך להמנון של עשייה ופריצת גבולות?`, options: [`צמאה לך נפשי`, `הוא אלוקינו`, `אני מאמין`, `ופרצת`], correct: 3 },
+            { q: `מה הייתה הוראתו המרעישה של הרבי בכ"ח ניסן תנש"א?`, options: [`להדפיס תניא בכל מקום`, `עשו כל אשר ביכלתכם להביא את משיח צדקנו`, `לפתוח בית חב"ד בכל עיר`, `להתאחד בלימוד הרמב"ם`], correct: 1 },
+            { q: `איך מכונה יום הולדתו של הרבי (י"א ניסן) בקרב החסידים?`, options: [`יום הבהיר`, `ראש השנה לחסידות`, `חג הגאולה`, `יום ההתייסדות`], correct: 0 }
+        ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let canAnswer = true;
+        let userName = "";
+        let userEmail = "";
+
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const endScreen = document.getElementById('end-screen');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const counterDisplay = document.getElementById('question-counter');
+        const scoreDisplay = document.getElementById('score-display');
+        const feedbackDisplay = document.getElementById('feedback');
+        const finalScoreDisplay = document.getElementById('final-score');
+        const scoreMessage = document.getElementById('score-message');
+        const webhookStatus = document.getElementById('webhook-status');
+        const adminControls = document.getElementById('admin-controls');
+        const adminModal = document.getElementById('admin-modal-overlay');
+        const adminInput = document.getElementById('admin-pass-input');
+
+        function openAdminModal() {
+            adminModal.style.display = 'flex';
+            adminInput.value = "";
+            setTimeout(() => adminInput.focus(), 100);
+        }
+
+        function closeAdminModal() {
+            adminModal.style.display = 'none';
+        }
+
+        function closeAdminModalOutside(e) {
+            if (e.target === adminModal) closeAdminModal();
+        }
+
+        function checkAdminPassword() {
+            if (adminInput.value === "770358") {
+                adminControls.classList.remove('hidden');
+                closeAdminModal();
+            } else {
+                document.getElementById('admin-error').classList.remove('hidden');
+                adminInput.value = "";
+            }
+        }
+
+        adminInput.addEventListener("keyup", (e) => { if (e.key === "Enter") checkAdminPassword(); });
+
+        function syncFormDataForAdmin() {
+            const typedName = document.getElementById('user-name').value.trim();
+            const typedEmail = document.getElementById('user-email').value.trim();
+            userName = typedName || "מענדי (בדיקה)";
+            userEmail = typedEmail || "test@example.com";
+            const overrideScore = parseInt(document.getElementById('admin-score-input').value);
+            return isNaN(overrideScore) ? 30 : Math.min(30, Math.max(0, overrideScore));
+        }
+
+        function validateAndStart() {
+            userName = document.getElementById('user-name').value.trim();
+            userEmail = document.getElementById('user-email').value.trim();
+            const consent = document.getElementById('email-consent').checked;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!userName || !emailRegex.test(userEmail) || !consent) {
+                document.getElementById('form-error').classList.remove('hidden');
+                return;
+            }
+            document.getElementById('form-error').classList.add('hidden');
+            startGame();
+        }
+
+        function previewEndScreen() {
+            score = syncFormDataForAdmin();
+            showEndScreen();
+            startScreen.classList.add('hidden');
+        }
+
+        function confirmTestSend() {
+            document.getElementById('main-test-btn').classList.add('hidden');
+            document.getElementById('confirm-test-area').classList.remove('hidden');
+        }
+
+        function cancelTestSend() {
+            document.getElementById('main-test-btn').classList.remove('hidden');
+            document.getElementById('confirm-test-area').classList.add('hidden');
+        }
+
+        async function sendTestWebhook() {
+            const testScore = syncFormDataForAdmin();
+            const success = await sendWebhook(testScore);
+            
+            if (success) {
+                const statusMsg = document.getElementById('admin-status-msg');
+                statusMsg.classList.remove('hidden');
+                cancelTestSend(); 
+                setTimeout(() => { statusMsg.classList.add('hidden'); }, 5000);
+            }
+        }
+
+        function startGame() {
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            canAnswer = true;
+            feedbackDisplay.classList.add('hidden');
+            const q = questions[currentQuestionIndex];
+            const progress = (currentQuestionIndex / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            counterDisplay.innerText = `שאלה ${currentQuestionIndex + 1} / ${questions.length}`;
+            questionText.innerText = q.q;
+            optionsContainer.innerHTML = '';
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.innerText = opt;
+                btn.className = "option-btn w-full p-4 md:p-5 text-right rounded-2xl text-gray-800 font-bold text-lg md:text-xl";
+                btn.onclick = () => checkAnswer(i);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function checkAnswer(i) {
+            if (!canAnswer) return;
+            canAnswer = false;
+            const q = questions[currentQuestionIndex];
+            const btns = optionsContainer.getElementsByTagName('button');
+            if (i === q.correct) {
+                score++;
+                btns[i].classList.add('bg-green-100', 'border-green-600');
+                showFeedback("נכון מאד!", "bg-green-50", "text-green-800", "border-green-600");
+            } else {
+                btns[i].classList.add('bg-red-100', 'border-red-600');
+                btns[q.correct].classList.add('bg-green-50', 'border-green-600');
+                showFeedback(`לא נכון. התשובה: ${q.options[q.correct]}`, "bg-red-50", "text-red-800", "border-red-600");
+            }
+            scoreDisplay.innerText = `ניקוד: ${score}`;
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < questions.length) loadQuestion();
+                else showEndScreen();
+            }, 2000);
+        }
+
+        function showFeedback(txt, bg, col, border) {
+            feedbackDisplay.innerText = txt;
+            feedbackDisplay.className = `mt-8 p-5 rounded-2xl font-bold text-xl md:text-2xl border-2 ${bg} ${col} ${border}`;
+            feedbackDisplay.classList.remove('hidden');
+        }
+
+        function showEndScreen() {
+            quizScreen.classList.add('hidden');
+            endScreen.classList.remove('hidden');
+            finalScoreDisplay.innerText = `${score} / ${questions.length}`;
+            document.getElementById('end-greeting').innerText = `כל הכבוד, ${userName}!`;
+            sendWebhook(score);
+            if (score >= 25) scoreMessage.innerText = "בקיאות מדהימה בפרטים!";
+            else if (score >= 15) scoreMessage.innerText = "ציון יפה מאוד. הזדמנות טובה ללמוד עוד!";
+            else scoreMessage.innerText = "תודה על ההשתתפות! החידון נועד כדי שנלמד ונוסיף בידע.";
+        }
+
+        async function sendWebhook(finalScore) {
+            const url = "https://n8n.srv1258673.hstgr.cloud/webhook/7a306899-2fee-45ff-9a6f-e31b2790be7f";
+            webhookStatus.classList.remove('hidden');
+            const perc = Math.round((finalScore / questions.length) * 100);
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        event: "quiz_completed",
+                        user: { name: userName, email: userEmail },
+                        results: { score: finalScore, total: questions.length, percentage: perc },
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                if (response.ok) {
+                    webhookStatus.innerText = "התוצאה נשמרה בהצלחה!";
+                    return true;
+                }
+            } catch (e) {
+                webhookStatus.innerText = "שגיאה בשמירת התוצאה.";
+                return false;
+            }
+            return false;
+        }
+
+        function restartGame() {
+            location.reload();
+        }
+    </script>
+</body>
+</html>
