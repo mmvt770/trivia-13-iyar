@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <link rel="icon" type="image/png" href="favicon.png?v=1">
+    <link rel="icon" type="image/png" href="favicon.png?v=1">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>טריוויה י"א ניסן - יום הולדת הרבי</title>
+    <title>חידון י"ג אייר - יום ההילולא של ר' ישראל אריה לייב</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -69,12 +69,14 @@
             position: relative;
             z-index: 10000;
         }
-        .status-pulse {
-            animation: status-pulse 0.5s ease-in-out infinite alternate;
-        }
-        @keyframes status-pulse {
-            from { transform: scale(1); }
-            to { transform: scale(1.05); }
+        .hero-image {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 4px solid #ca8a04;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            margin: 0 auto 1.5rem;
         }
     </style>
 </head>
@@ -101,19 +103,13 @@
         
         <!-- START SCREEN -->
         <div id="start-screen" class="relative z-10">
-            <h1 class="text-5xl md:text-7xl font-extrabold text-blue-900 mb-6 tracking-tight text-center">חידון י"א ניסן</h1>
-            <h2 class="text-xl md:text-3xl font-semibold text-yellow-600 mb-8 text-center leading-relaxed">
-                כמה אתה יודע על הרבי מליובאוויטש?
-            </h2>
+            <!-- שילוב התמונה במסך הפתיחה -->
+            <img src="header.png" alt="תמונת הרבי" class="hero-image" onerror="this.style.display='none'">
             
-            <div class="flex justify-center mb-8">
-                <div class="p-6 bg-yellow-50 rounded-full shadow-inner border border-yellow-200">
-                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#ca8a04" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M5 15l-2-7 5 3 4-8 4 8 5-3-2 7h-14z"></path>
-                        <path d="M22 17v2a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-2"></path>
-                    </svg>
-                </div>
-            </div>
+            <h1 class="text-4xl md:text-6xl font-extrabold text-blue-900 mb-4 tracking-tight text-center">חידון י"ג אייר</h1>
+            <h2 class="text-xl md:text-2xl font-semibold text-yellow-600 mb-8 text-center leading-relaxed">
+                כמה אתם יודעים על ר' ישראל אריה לייב?
+            </h2>
 
             <div class="max-w-md mx-auto mb-8 bg-gray-50 p-6 rounded-2xl shadow-inner border border-gray-200 text-right">
                 <p class="text-gray-600 font-bold mb-4 text-lg">אנא מלא את פרטיך כדי להתחיל:</p>
@@ -137,8 +133,8 @@
             <!-- ADMIN INTERFACE -->
             <div id="admin-controls" class="hidden flex flex-col items-center gap-4 mt-6 p-8 border-4 border-dashed border-red-200 rounded-3xl bg-red-50">
                 <div class="mb-6 flex flex-col items-center w-full">
-                    <label class="block text-red-800 font-extrabold mb-3 text-xl">כמות שאלות נכונות (0-30):</label>
-                    <input type="number" id="admin-score-input" min="0" max="30" value="30" class="w-32 px-4 py-3 rounded-2xl border-4 border-red-300 text-center text-3xl font-black text-red-900 focus:outline-none focus:border-red-500 shadow-inner">
+                    <label class="block text-red-800 font-extrabold mb-3 text-xl">כמות שאלות נכונות (0-10):</label>
+                    <input type="number" id="admin-score-input" min="0" max="10" value="10" class="w-32 px-4 py-3 rounded-2xl border-4 border-red-300 text-center text-3xl font-black text-red-900 focus:outline-none focus:border-red-500 shadow-inner">
                 </div>
                 
                 <div class="flex flex-col md:flex-row gap-6 w-full justify-center">
@@ -153,8 +149,11 @@
                     </div>
                 </div>
                 
-                <div id="admin-status-msg" class="hidden mt-6 p-6 bg-red-600 text-white rounded-2xl border-8 border-red-900 shadow-2xl status-pulse">
-                    <p class="text-3xl font-black">הטסט נשלח בהצלחה! 🚀</p>
+                <div id="admin-status-msg" class="hidden mt-6 p-6 bg-green-600 text-white rounded-2xl border-4 border-green-800 shadow-xl">
+                    <p class="text-2xl font-bold">הטסט נשלח בהצלחה! 🚀</p>
+                </div>
+                <div id="admin-error-msg" class="hidden mt-6 p-6 bg-red-600 text-white rounded-2xl border-4 border-red-800 shadow-xl">
+                    <p class="text-2xl font-bold">שגיאה בשליחה. וודא שהכתובת תקינה וה-Workflow פעיל.</p>
                 </div>
             </div>
 
@@ -169,7 +168,7 @@
                 <div id="progress-bar" class="bg-gradient-to-r from-yellow-400 to-yellow-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
             <div class="flex justify-between items-center mb-8 border-b pb-4">
-                <span id="question-counter" class="text-blue-900 font-extrabold text-lg md:text-2xl">שאלה 1 / 30</span>
+                <span id="question-counter" class="text-blue-900 font-extrabold text-lg md:text-2xl">שאלה 1 / 10</span>
                 <span id="score-display" class="bg-blue-900 text-white px-4 md:px-6 py-2 rounded-xl font-bold text-lg">ניקוד: 0</span>
             </div>
             <div class="mb-10 text-center">
@@ -182,48 +181,32 @@
         <!-- END SCREEN -->
         <div id="end-screen" class="hidden relative z-10 text-center">
             <h2 class="text-4xl md:text-5xl font-black text-blue-900 mb-6" id="end-greeting">החידון הושלם!</h2>
-            <div class="text-7xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-700 mb-4" id="final-score">0/30</div>
+            <div class="text-7xl md:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 to-yellow-700 mb-4" id="final-score">0/10</div>
             <p id="score-message" class="text-xl md:text-2xl mb-6 font-bold text-blue-900"></p>
-            <div class="bg-blue-50 p-4 rounded-xl border border-blue-200 mb-8 max-w-sm mx-auto">
-                <p class="text-blue-900 font-bold text-lg text-center">📩 אימייל עם תוצאות החידון נשלח אליך ברגע זה!</p>
+            
+            <p id="webhook-status" class="text-lg font-bold text-yellow-600 mb-6 hidden text-center">שומר נתונים ושולח אימייל... ⏳</p>
+            
+            <div id="success-email-box" class="hidden bg-blue-50 p-4 rounded-xl border border-blue-200 mb-8 max-w-sm mx-auto transform transition-all">
+                <p class="text-blue-900 font-bold text-lg text-center">📩 התוצאות נשלחו בהצלחה לאימייל:</p>
+                <p id="user-email-display" class="text-blue-700 font-bold text-xl text-center mt-2" dir="ltr"></p>
             </div>
-            <p id="webhook-status" class="text-lg font-bold text-gray-600 mb-6 hidden text-center">שומר תוצאה במערכת...</p>
+
             <button onclick="restartGame()" class="bg-gray-800 hover:bg-black text-white font-bold py-3 px-10 rounded-full text-xl transition-all shadow-xl">נסה שוב</button>
         </div>
     </div>
 
     <script>
         const questions = [
-            { q: `באיזו שנה נולד הרבי?`, options: [`תרס"א (1901)`, `תרס"ב (1902)`, `תרס"ג (1903)`, `תרס"ד (1904)`], correct: 1 },
-            { q: `מי היה הסנדק בברית המילה של הרבי?`, options: [`אביו, רבי לוי יצחק`, `סבו, רבי ברוך שניאור`, `לא ידוע`, `הרבי הריי"צ`], correct: 2 },
-            { q: `באיזה תאריך נערכה חתונת הרבי והרבנית חיה מושקא בוורשה?`, options: [`י"א ניסן תרפ"ט`, `י"ד כסלו תרפ"ט`, `י' שבט תרפ"ח`, `כ"ח סיון תש"א`], correct: 1 },
-            { q: `כיצד נקראה האוניה בה הגיעו הרבי והרבנית לארצות הברית?`, options: [`קווין מרי`, `סרפה פינטו`, `מוריטניה`, `סטורדייל`], correct: 1 },
-            { q: `מהו הספר הראשון שהרבי ליקט, ערך והוציא לאור בארה"ב?`, options: [`היום יום`, `לקוטי שיחות`, `אגרות קודש`, `ספר המאמרים`], correct: 0 },
-            { q: `באיזה מוסד בפריז הוענק לרבי התואר "מהנדס חשמל"?`, options: [`אוניברסיטת ברלין`, `אוניברסיטת הסורבון`, `ESTP בפריז`, `המכון הטכנולוגי`], correct: 2 },
-            { q: `באיזו שנה הכריז הרבי על "מבצע תפילין"?`, options: [`תשכ"ז (1967)`, `תשל"ד (1973)`, `תש"מ (1980)`, `תשמ"ב (1982)`], correct: 0 },
-            { q: `מי נחשב לשליח הראשון שהרבי שלח למרוקו בשנת תש"י?`, options: [`הרב ניסן פינסון`, `הרב שלמה מטוסוב`, `הרב לייבל רסקין`, `הרב אברהם שם טוב`], correct: 1 },
-            { q: `באיזה תאריך חל היארצייט של אביו של הרבי, רבי לוי יצחק?`, options: [`כ' מנחם אב`, `ח"י אלול`, `ה' טבת`, `ו' תשרי`], correct: 0 },
-            { q: `כמה כרכים מונה סדרת "לקוטי שיחות" (המהדורה הרשמית)?`, options: [`35`, `40`, `41`, `45`], correct: 2 },
-            { q: `באיזו שנה יסד הרבי את הארגון לילדים "צבאות השם"?`, options: [`תשל"א`, `תשל"ו`, `תשמ"א`, `תשמ"ז`], correct: 2 },
-            { q: `עם איזה מאמר קיבל הרבי עליו את הנשיאות בי' שבט תשי"א?`, options: [`ציון במשפט תפדה`, `ואתה תצווה`, `אנא נסיב מלכא`, `באתי לגני`], correct: 3 },
-            { q: `באיזה תאריך חוגגים החסידים את "דידן נצח" (סיום משפט הספרים)?`, options: [`ה' טבת`, `י"ט כסלו`, `י"ב תמוז`, `י"ג תשרי`], correct: 0 },
-            { q: `מי מונה ליו"ר המוסד "מחנה ישראל" עם הקמתו על ידי הרבי הריי"צ?`, options: [`הרבי`, `הרב חודקוב`, `הרב מנטליק`, `הרב גוראריה`], correct: 0 },
-            { q: `בעקבות איזה אירוע כואב בשנת תשל"ד הכריז הרבי על "מבצע מזוזה"?`, options: [`מלחמת יום כיפור`, `הפיגוע במעלות (אסון מעלות)`, `חטיפת מטוס באנטבה`, `מלחמת ששת הימים`], correct: 1 },
-            { q: `באיזו שנה החלה חלוקת "דולרים לצדקה" באופן קבוע בימי ראשון?`, options: [`תשל"ח`, `תשמ"ו`, `תש"נ`, `תשמ"ט`], correct: 1 },
-            { q: `מה היה שמו של אחיו הצעיר של הרבי (אשר נטמן בצפת)?`, options: [`דובער`, `ברוך שניאור`, `ישראל אריה לייב`, `לוי יצחק`], correct: 2 },
-            { q: `איזו תקנה תורנית תיקן הרבי במטרה לאחד את כל עם ישראל סביב לימוד כל התורה כולה?`, options: [`לימוד חת"ת`, `תקנת הרמב"ם היומי`, `מבצע אות בספר תורה`, `שנת הקהל`], correct: 1 },
-            { q: `מהי עיר הולדתו של הרבי?`, options: [`ליובאוויטש`, `רוסטוב`, `יקטרינוסלב`, `ניקולייב`], correct: 3 },
-            { q: `מי הייתה אמו של הרבי?`, options: [`הרבנית שטערנא שרה`, `הרבנית חנה`, `הרבנית רבקה`, `הרבנית חיה מושקא`], correct: 1 },
-            { q: `מה חילק הרבי באופן מסורתי בערב יום כיפור?`, options: [`דולרים כפולים`, `כוס של ברכה`, `לעקאח (עוגת דבש)`, `מטבעות לצדקה`], correct: 2 },
-            { q: `איזה חיבור יסודי כתב הרבי בצרפת בטרם נמלט לארה"ב?`, options: [`מראה מקומות לתניא`, `הגדה של פסח עם לקוטי מנהגים`, `רשימות על התניא`, `לקוטי תורה צמח צדק`], correct: 2 },
-            { q: `לאיזו רשת מוסדות חינוך קרא הרבי בחיבה "הבובה שלי"?`, options: [`רשת אהלי יוסף יצחק באה"ק`, `תומכי תמימים`, `בית חב"ד`, `מכון חנה`], correct: 0 },
-            { q: `מהו הקונטרס האחרון שחילק הרבי בידו הקדושה לפני כ"ז אדר א' תשנ"ב?`, options: [`קונטרס ענינה של תורת החסידות`, `קונטרס בית רבינו שבבבל`, `קונטרס ואתה תצוה`, `קונטרס פורים קטן`], correct: 2 },
-            { q: `כמה מבצעים כלולים ברשימה המקורית של "מבצעי הרבי"?`, options: [`7`, `10`, `12`, `15`], correct: 1 },
-            { q: `באיזה תאריך חל יום ההסתלקות של הרבנית חיה מושקא ע"ה (בשנת תשמ"ח)?`, options: [`כ"ב שבט`, `ו' תשרי`, `י"ג אדר`, `י' שבט`], correct: 0 },
-            { q: `באיזו עיר שימש רבי לוי יצחק, אביו של הרבי, כרב הראשי?`, options: [`פטרבורג`, `מוסקבה`, `יקטרינוסלב (דניפרו)`, `ניקולייב`], correct: 2 },
-            { q: `איזה ניגון שלימד הרבי הפך להמנון של עשייה ופריצת גבולות?`, options: [`צמאה לך נפשי`, `הוא אלוקינו`, `אני מאמין`, `ופרצת`], correct: 3 },
-            { q: `מה הייתה הוראתו המרעישה של הרבי בכ"ח ניסן תנש"א?`, options: [`להדפיס תניא בכל מקום`, `עשו כל אשר ביכלתכם להביא את משיח צדקנו`, `לפתוח בית חב"ד בכל עיר`, `להתאחד בלימוד הרמב"ם`], correct: 1 },
-            { q: `איך מכונה יום הולדתו של הרבי (י"א ניסן) בקרב החסידים?`, options: [`יום הבהיר`, `ראש השנה לחסידות`, `חג הגאולה`, `יום ההתייסדות`], correct: 0 }
+            { q: `באיזה תאריך נולד ר' ישראל אריה לייב?`, options: [`כ"א באייר תרס"ו`, `י"א ניסן תרס"ב`, `י"ג באייר תרס"ו`, `כ' מנחם אב תרנ"ט`], correct: 0 },
+            { q: `באיזה שם כינוי או שם ספרותי השתמש ר' ישראל אריה לייב?`, options: [`אריאל`, `מרדכי (מארק) גוראריה`, `מענדל`, `לייבל שניאורסון בלבד`], correct: 1 },
+            { q: `היכן נמצא מקום קבורתו של ר' ישראל אריה לייב?`, options: [`ניו יורק (האוהל)`, `ליברפול (אנגליה)`, `טבריה`, `צפת (בית העלמין העתיק)`], correct: 3 },
+            { q: `מה היה שמה של בתו היחידה של ר' ישראל אריה לייב?`, options: [`חנה`, `שרה`, `דליה`, `רבקה`], correct: 2 },
+            { q: `באיזה מוסד מדעי עבד ר' ישראל אריה לייב בישראל, ונחשב למדען הראשון בו?`, options: [`הטכניון`, `מכון ויצמן למדע`, `אוניברסיטת תל אביב`, `האוניברסיטה העברית`], correct: 1 },
+            { q: `כיצד הגיב ר' ישראל אריה לייב כשקיבל מאחיו (הרבי) את הספר "לוח היום יום"?`, options: [`"ספר נחמד מאוד"`, `"לא הבנתי את תוכנו"`, `"תמיד ידעתי שלאחי יש 'ראש טוב', אבל עד כדי כך!"`, `"הלוואי שהיה נדפס ברוסית"`], correct: 2 },
+            { q: `כיצד הצליח לעבור את הגבול מברית המועצות לברלין בשנת תר"צ?`, options: [`בעזרת אשרת סטודנט מיוחדת`, `עם דרכון על השם "מרדכי גוראריה"`, `הוברח ברכבת משא לאירופה`, `על ידי מתן שוחד לשומרי הגבול`], correct: 1 },
+            { q: `מי דאג להוציא לאור את חיבורו המדעי של ר' ישראל אריה לייב במתמטיקה?`, options: [`פרופסור שמעון סילמן`, `ראש הממשלה דוד בן גוריון`, `פרופסור פסח רוזנבלום`, `חבר הכנסת יונה כסה`], correct: 2 },
+            { q: `איזו עובדה חשובה הסתיר הרבי מאמו, הרבנית חנה, עד יום פטירתה?`, options: [`שישראל אריה לייב עזב לאנגליה`, `שישראל אריה לייב חלה בטיפוס`, `שישראל אריה לייב נפטר בליברפול`, `שישראל אריה לייב התחתן עם גניה`], correct: 2 },
+            { q: `איזה ניגון נחשף כניגון ששר' ישראל אריה לייב אהב לנגן תדיר?`, options: [`צמאה לך נפשי`, `ניגון הפלפול`, `הוא אלוקינו`, `ניגון הקפות של אדמו"ר הזקן`], correct: 1 }
         ];
 
         let currentQuestionIndex = 0;
@@ -279,7 +262,7 @@
             userName = typedName || "מענדי (בדיקה)";
             userEmail = typedEmail || "test@example.com";
             const overrideScore = parseInt(document.getElementById('admin-score-input').value);
-            return isNaN(overrideScore) ? 30 : Math.min(30, Math.max(0, overrideScore));
+            return isNaN(overrideScore) ? questions.length : Math.min(questions.length, Math.max(0, overrideScore));
         }
 
         function validateAndStart() {
@@ -315,11 +298,18 @@
             const testScore = syncFormDataForAdmin();
             const success = await sendWebhook(testScore);
             
+            const successMsg = document.getElementById('admin-status-msg');
+            const errorMsg = document.getElementById('admin-error-msg');
+            
             if (success) {
-                const statusMsg = document.getElementById('admin-status-msg');
-                statusMsg.classList.remove('hidden');
+                if (successMsg) successMsg.classList.remove('hidden');
+                if (errorMsg) errorMsg.classList.add('hidden');
                 cancelTestSend(); 
-                setTimeout(() => { statusMsg.classList.add('hidden'); }, 5000);
+                setTimeout(() => { if (successMsg) successMsg.classList.add('hidden'); }, 5000);
+            } else {
+                if (errorMsg) errorMsg.classList.remove('hidden');
+                if (successMsg) successMsg.classList.add('hidden');
+                setTimeout(() => { if (errorMsg) errorMsg.classList.add('hidden'); }, 5000);
             }
         }
 
@@ -378,17 +368,39 @@
         function showEndScreen() {
             quizScreen.classList.add('hidden');
             endScreen.classList.remove('hidden');
-            finalScoreDisplay.innerText = `${score} / ${questions.length}`;
-            document.getElementById('end-greeting').innerText = `כל הכבוד, ${userName}!`;
+            
+            // וידוא קיום האלמנטים לפני עדכון
+            const finalScoreEl = document.getElementById('final-score');
+            const greetingEl = document.getElementById('end-greeting');
+            const emailDisplayEl = document.getElementById('user-email-display');
+            const scoreMsgEl = document.getElementById('score-message');
+
+            if (finalScoreEl) finalScoreEl.innerText = `${score} / ${questions.length}`;
+            if (greetingEl) greetingEl.innerText = `כל הכבוד, ${userName}!`;
+            if (emailDisplayEl) emailDisplayEl.innerText = userEmail;
+            
             sendWebhook(score);
-            if (score >= 25) scoreMessage.innerText = "בקיאות מדהימה בפרטים!";
-            else if (score >= 15) scoreMessage.innerText = "ציון יפה מאוד. הזדמנות טובה ללמוד עוד!";
-            else scoreMessage.innerText = "תודה על ההשתתפות! החידון נועד כדי שנלמד ונוסיף בידע.";
+            
+            if (scoreMsgEl) {
+                if (score >= 8) scoreMsgEl.innerText = "בקיאות מדהימה בפרטים!";
+                else if (score >= 5) scoreMsgEl.innerText = "ציון יפה מאוד. הזדמנות טובה ללמוד עוד!";
+                else scoreMsgEl.innerText = "תודה על ההשתתפות! החידון נועד כדי שנלמד ונוסיף בידע.";
+            }
         }
 
         async function sendWebhook(finalScore) {
             const url = "https://n8n.manyautomations.cloud/webhook/7a306899-2fee-45ff-9a6f-e31b2790be7f";
-            webhookStatus.classList.remove('hidden');
+            
+            const statusEl = document.getElementById('webhook-status');
+            const successBoxEl = document.getElementById('success-email-box');
+
+            if (statusEl) {
+                statusEl.innerText = "שומר נתונים ושולח אימייל... ⏳";
+                statusEl.className = "text-lg font-bold text-yellow-600 mb-6 text-center";
+                statusEl.classList.remove('hidden');
+            }
+            if (successBoxEl) successBoxEl.classList.add('hidden');
+            
             const perc = Math.round((finalScore / questions.length) * 100);
             try {
                 const response = await fetch(url, {
@@ -396,17 +408,29 @@
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         event: "quiz_completed",
+                        quiz_topic: "Yisrael Aryeh Leib",
                         user: { name: userName, email: userEmail },
                         results: { score: finalScore, total: questions.length, percentage: perc },
                         timestamp: new Date().toISOString()
                     })
                 });
+                
                 if (response.ok) {
-                    webhookStatus.innerText = "התוצאה נשמרה בהצלחה!";
+                    if (statusEl) statusEl.classList.add('hidden');
+                    if (successBoxEl) successBoxEl.classList.remove('hidden');
                     return true;
+                } else {
+                    if (statusEl) {
+                        statusEl.innerText = "שגיאה בשמירת התוצאה בשרת.";
+                        statusEl.className = "text-lg font-bold text-red-600 mb-6 text-center";
+                    }
                 }
             } catch (e) {
-                webhookStatus.innerText = "שגיאה בשמירת התוצאה.";
+                console.error("Webhook error:", e);
+                if (statusEl) {
+                    statusEl.innerText = "שגיאה בשליחת התוצאות (בדוק חיבור אינטרנט).";
+                    statusEl.className = "text-lg font-bold text-red-600 mb-6 text-center";
+                }
                 return false;
             }
             return false;
